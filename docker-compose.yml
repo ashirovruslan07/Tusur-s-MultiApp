@@ -1,0 +1,18 @@
+name: multiapp
+
+services:
+  multiapp:
+    build: .
+    container_name: multiapp
+    ports:
+      - "8000:8000"
+    environment:
+      MULTIAPP_DB_PATH: /app/data/multi_app.sqlite
+      MULTIAPP_TIMEZONE: Asia/Tomsk
+      TZ: Asia/Tomsk
+    volumes:
+      - multiapp-data:/app/data
+    restart: unless-stopped
+
+volumes:
+  multiapp-data:

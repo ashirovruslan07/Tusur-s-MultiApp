@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MultiApp — Главная</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-logo">M</div>
+        <div>
+          <h1>MultiApp</h1>
+          <p>Органайзер студента</p>
+        </div>
+      </div>
+
+      <div class="menu-title">Модули</div>
+      <nav class="menu">
+        <a href="dashboard.html" class="menu-item active">Главная</a>
+<a href="schedule.html" class="menu-item ">Расписание</a>
+<a href="finance.html" class="menu-item ">Финансы</a>
+<a href="workouts.html" class="menu-item ">Тренировки</a>
+<a href="planner.html" class="menu-item ">Ежедневник</a>
+<a href="portfolio.html" class="menu-item">Портфолио</a>
+<a href="profile.html" class="menu-item ">Профиль</a>
+<a href="settings.html" class="menu-item ">Настройки</a>
+      </nav>
+
+      <div class="sidebar-card">
+        <h3>Текущая неделя</h3>
+        <p>Четная · 5 учебная неделя</p>
+        <span class="badge badge-sync">Синхронизация расписания включена</span>
+      </div>
+    </aside>
+
+    <main class="content">
+      
+<header class="topbar">
+  <div>
+    <h2>Главный экран</h2>
+    <p>Сводная информация по расписанию, финансам, тренировкам и ежедневнику.</p>
+  </div>
+  <div class="top-actions">
+    <input class="search" placeholder="Поиск по модулю или задаче" />
+    <button class="btn btn-primary">Быстрое действие</button>
+  </div>
+</header>
+
+<section class="grid grid-4">
+  <div class="kpi kpi-primary"><h3>Пар завтра</h3><strong>4</strong><small>Первая пара в 09:00</small></div>
+  <div class="kpi kpi-green"><h3>Баланс</h3><strong>18 450 ₽</strong><small>За месяц расходов: 9 870 ₽</small></div>
+  <div class="kpi kpi-cyan"><h3>Тренировок за неделю</h3><strong>3</strong><small>Следующая — завтра, 18:30</small></div>
+  <div class="kpi kpi-purple"><h3>Активных задач</h3><strong>7</strong><small>2 задачи на сегодня</small></div>
+</section>
+
+<div class="section-spacer"></div>
+
+<section class="grid grid-2">
+  <a class="card module-card" href="schedule.html">
+    <div class="module-top">
+      <div>
+        <h3>Расписание</h3>
+        <p>Просмотр недельной сетки, пар на сегодня и сохранённой группы.</p>
+      </div>
+      <div class="module-icon icon-schedule">📘</div>
+    </div>
+    <div class="stat-row">
+      <div class="stat-box">
+        <div class="stat-label">Сегодня</div>
+        <div class="stat-value">3 пары</div>
+        <div class="stat-note">Осталась 1 пара</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-label">Завтра</div>
+        <div class="stat-value">4 пары</div>
+        <div class="stat-note">Начало в 09:00</div>
+      </div>
+    </div>
+    <span class="badge badge-primary">Группа 592-1 · Четная</span>
+  </a>
+
+  <a class="card module-card" href="finance.html">
+    <div class="module-top">
+      <div>
+        <h3>Финансы</h3>
+        <p>Учёт счетов, доходов, расходов и быстрый просмотр текущего баланса.</p>
+      </div>
+      <div class="module-icon icon-finance">₽</div>
+    </div>
+    <div class="stat-row">
+      <div class="stat-box">
+        <div class="stat-label">Баланс</div>
+        <div class="stat-value">18 450 ₽</div>
+        <div class="stat-note">3 активных счёта</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-label">Расходы</div>
+        <div class="stat-value">9 870 ₽</div>
+        <div class="stat-note">За текущий месяц</div>
+      </div>
+    </div>
+    <span class="badge badge-green">Последняя операция: Продукты · 890 ₽</span>
+  </a>
+
+  <a class="card module-card" href="workouts.html">
+    <div class="module-top">
+      <div>
+        <h3>Тренировки</h3>
+        <p>Планы, упражнения, журнал выполненных тренировок и статистика.</p>
+      </div>
+      <div class="module-icon icon-workout">💪</div>
+    </div>
+    <div class="stat-row">
+      <div class="stat-box">
+        <div class="stat-label">За неделю</div>
+        <div class="stat-value">3</div>
+        <div class="stat-note">Выполнено тренировок</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-label">Следующая</div>
+        <div class="stat-value">Завтра</div>
+        <div class="stat-note">Спина и плечи, 18:30</div>
+      </div>
+    </div>
+    <span class="badge badge-cyan">Прогресс: 78% плана недели</span>
+  </a>
+
+  <a class="card module-card" href="planner.html">
+    <div class="module-top">
+      <div>
+        <h3>Ежедневник</h3>
+        <p>Задачи, события календаря и личные заметки в едином интерфейсе.</p>
+      </div>
+      <div class="module-icon icon-planner">📝</div>
+    </div>
+    <div class="stat-row">
+      <div class="stat-box">
+        <div class="stat-label">Задачи</div>
+        <div class="stat-value">7</div>
+        <div class="stat-note">2 — высокий приоритет</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-label">События</div>
+        <div class="stat-value">3</div>
+        <div class="stat-note">Ближайшее сегодня в 16:00</div>
+      </div>
+    </div>
+    <span class="badge badge-purple">Есть дедлайн завтра</span>
+  </a>
+</section>
+
+<section class="grid grid-2" style="margin-top:20px;">
+  <div class="card">
+    <div class="card-header">
+      <div>
+        <h3 class="card-title">События на сегодня</h3>
+        <p class="card-subtitle">Краткая лента важных действий.</p>
+      </div>
+      <span class="badge badge-neutral">09 марта</span>
+    </div>
+    <div class="list">
+      <div class="list-item">
+        <div class="list-main"><h4>Пара: Базы данных</h4><p>10:40–12:10 · ауд. 214</p></div>
+        <span class="badge badge-primary">Расписание</span>
+      </div>
+      <div class="list-item">
+        <div class="list-main"><h4>Оплата интернета</h4><p>Плановый расход 650 ₽</p></div>
+        <span class="badge badge-green">Финансы</span>
+      </div>
+      <div class="list-item">
+        <div class="list-main"><h4>Тренировка: Ноги</h4><p>18:30–19:45 · зал</p></div>
+        <span class="badge badge-cyan">Тренировки</span>
+      </div>
+      <div class="list-item">
+        <div class="list-main"><h4>Сдать отчёт по практике</h4><p>Дедлайн до 23:59</p></div>
+        <span class="badge badge-purple">Ежедневник</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <div>
+        <h3 class="card-title">Общая активность</h3>
+        <p class="card-subtitle">Демонстрационный график для дашборда.</p>
+      </div>
+      <span class="badge badge-neutral">Неделя</span>
+    </div>
+    <div class="chart">
+      <div class="chart-bars">
+        <div class="bar" style="height:52%"></div>
+        <div class="bar purple" style="height:70%"></div>
+        <div class="bar green" style="height:61%"></div>
+        <div class="bar cyan" style="height:84%"></div>
+        <div class="bar" style="height:65%"></div>
+        <div class="bar purple" style="height:48%"></div>
+        <div class="bar green" style="height:76%"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+    </main>
+  </div>
+</body>
+</html>

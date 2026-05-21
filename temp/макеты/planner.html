@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MultiApp — Ежедневник</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-logo">M</div>
+        <div>
+          <h1>MultiApp</h1>
+          <p>Органайзер студента</p>
+        </div>
+      </div>
+
+      <div class="menu-title">Модули</div>
+      <nav class="menu">
+        <a href="dashboard.html" class="menu-item ">Главная</a>
+<a href="schedule.html" class="menu-item ">Расписание</a>
+<a href="finance.html" class="menu-item ">Финансы</a>
+<a href="workouts.html" class="menu-item ">Тренировки</a>
+<a href="planner.html" class="menu-item active">Ежедневник</a>
+<a href="portfolio.html" class="menu-item">Портфолио</a>
+<a href="profile.html" class="menu-item ">Профиль</a>
+<a href="settings.html" class="menu-item ">Настройки</a>
+      </nav>
+
+      <div class="sidebar-card">
+        <h3>Текущая неделя</h3>
+        <p>Четная · 5 учебная неделя</p>
+        <span class="badge badge-sync">Синхронизация расписания включена</span>
+      </div>
+    </aside>
+
+    <main class="content">
+      
+<header class="topbar">
+  <div>
+    <h2>Модуль «Ежедневник»</h2>
+    <p>Интерфейс для работы с задачами, календарными событиями и заметками пользователя.</p>
+  </div>
+  <div class="top-actions">
+    <button class="btn btn-purple">Новая задача</button>
+    <button class="btn btn-secondary">Новая заметка</button>
+  </div>
+</header>
+
+<section class="grid grid-3">
+  <div class="card">
+    <h3 class="section-title">Активные задачи</h3>
+    <div class="stat-value">7</div>
+    <div class="stat-note">2 с высоким приоритетом</div>
+  </div>
+  <div class="card">
+    <h3 class="section-title">События недели</h3>
+    <div class="stat-value">3</div>
+    <div class="stat-note">Ближайшее сегодня в 16:00</div>
+  </div>
+  <div class="card">
+    <h3 class="section-title">Заметки</h3>
+    <div class="stat-value">12</div>
+    <div class="stat-note">Последнее обновление — сегодня</div>
+  </div>
+</section>
+
+<section class="grid grid-2" style="margin-top:20px;">
+  <div class="card">
+    <div class="card-header">
+      <div>
+        <h3 class="card-title">Список задач</h3>
+        <p class="card-subtitle">Карточки задач с приоритетом и сроком выполнения.</p>
+      </div>
+    </div>
+    <div class="list">
+      <div class="list-item"><div class="list-main"><h4>Подготовить отчёт по практике</h4><p>Срок: 10.03.2026 · Учёба</p></div><span class="badge badge-purple">Высокий</span></div>
+      <div class="list-item"><div class="list-main"><h4>Оплатить интернет</h4><p>Срок: 11.03.2026 · Финансы</p></div><span class="badge badge-green">Средний</span></div>
+      <div class="list-item"><div class="list-main"><h4>Сходить в зал</h4><p>Срок: 10.03.2026 · Спорт</p></div><span class="badge badge-cyan">Запланировано</span></div>
+      <div class="list-item"><div class="list-main"><h4>Сделать резервную копию проекта</h4><p>Срок: 12.03.2026 · Личное</p></div><span class="badge badge-primary">Обычный</span></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <div>
+        <h3 class="card-title">Календарь событий</h3>
+        <p class="card-subtitle">Визуальный блок для событий по дням недели.</p>
+      </div>
+    </div>
+    <div class="calendar">
+      <div class="day-head">Пн</div><div class="day-head">Вт</div><div class="day-head">Ср</div><div class="day-head">Чт</div><div class="day-head">Пт</div><div class="day-head">Сб</div><div class="day-head">Вс</div>
+      <div class="day-cell"><strong>9</strong><span class="day-chip badge-primary">Отчёт</span></div>
+      <div class="day-cell"><strong>10</strong><span class="day-chip badge-cyan">Зал</span></div>
+      <div class="day-cell"><strong>11</strong><span class="day-chip badge-green">Оплата</span></div>
+      <div class="day-cell"><strong>12</strong></div>
+      <div class="day-cell"><strong>13</strong><span class="day-chip badge-purple">Встреча</span></div>
+      <div class="day-cell"><strong>14</strong></div>
+      <div class="day-cell"><strong>15</strong></div>
+    </div>
+  </div>
+</section>
+
+<section class="card" style="margin-top:20px;">
+  <div class="card-header">
+    <div>
+      <h3 class="card-title">Заметки</h3>
+      <p class="card-subtitle">Блок для текстовых записей и быстрых идей.</p>
+    </div>
+  </div>
+  <div class="form-grid">
+    <div class="field field-full">
+      <label>Заголовок заметки</label>
+      <input value="Идеи для дипломного проекта">
+    </div>
+    <div class="field field-full">
+      <label>Содержимое</label>
+      <textarea>Добавить экран статистики по учебной нагрузке, улучшить фильтры в финансах, продумать экспорт расписания в PDF.</textarea>
+    </div>
+  </div>
+</section>
+
+    </main>
+  </div>
+</body>
+</html>

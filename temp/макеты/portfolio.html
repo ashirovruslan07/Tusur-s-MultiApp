@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MultiApp — Портфолио</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-logo">M</div>
+        <div>
+          <h1>MultiApp</h1>
+          <p>Органайзер студента</p>
+        </div>
+      </div>
+
+      <div class="menu-title">Модули</div>
+      <nav class="menu">
+        <a href="dashboard.html" class="menu-item">Главная</a>
+        <a href="schedule.html" class="menu-item">Расписание</a>
+        <a href="finance.html" class="menu-item">Финансы</a>
+        <a href="workouts.html" class="menu-item">Тренировки</a>
+        <a href="planner.html" class="menu-item">Ежедневник</a>
+        <a href="portfolio.html" class="menu-item active">Портфолио</a>
+        <a href="profile.html" class="menu-item">Профиль</a>
+        <a href="settings.html" class="menu-item">Настройки</a>
+      </nav>
+
+      <div class="sidebar-card">
+        <h3>Статус портфолио</h3>
+        <p>Заполнено на 78%</p>
+        <span class="badge badge-sync">6 проектов · 3 сертификата</span>
+      </div>
+    </aside>
+
+    <main class="content">
+      <header class="topbar">
+        <div>
+          <h2>Модуль «Портфолио»</h2>
+          <p>Экран для хранения учебных проектов, достижений, сертификатов, навыков и файлов студента.</p>
+        </div>
+        <div class="top-actions">
+          <button class="btn btn-secondary">Импорт</button>
+          <button class="btn btn-purple">Добавить запись</button>
+        </div>
+      </header>
+
+      <section class="grid grid-4">
+        <div class="kpi kpi-primary">
+          <h3>Проекты</h3>
+          <strong>6</strong>
+          <small>2 новых за семестр</small>
+        </div>
+        <div class="kpi kpi-purple">
+          <h3>Сертификаты</h3>
+          <strong>3</strong>
+          <small>1 добавлен недавно</small>
+        </div>
+        <div class="kpi kpi-cyan">
+          <h3>Навыки</h3>
+          <strong>12</strong>
+          <small>Технические и личные</small>
+        </div>
+        <div class="kpi kpi-green">
+          <h3>Заполненность</h3>
+          <strong>78%</strong>
+          <small>Профиль почти готов</small>
+        </div>
+      </section>
+
+      <section class="grid grid-2" style="margin-top:20px;">
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <h3 class="card-title">Профиль студента</h3>
+              <p class="card-subtitle">Краткая информация, которая отображается в шапке портфолио.</p>
+            </div>
+          </div>
+
+          <div class="profile">
+            <div class="avatar">Д</div>
+            <div>
+              <h3 style="margin:0;">Дмитрий Иванов</h3>
+              <div class="muted">Студент · Информационные системы</div>
+              <div style="margin-top:10px; display:flex; gap:8px; flex-wrap:wrap;">
+                <span class="badge badge-primary">C# / WPF</span>
+                <span class="badge badge-cyan">SQL / SQLite</span>
+                <span class="badge badge-green">UI/UX</span>
+                <span class="badge badge-purple">Telegram Bots</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-grid" style="margin-top:18px;">
+            <div class="field">
+              <label>ФИО</label>
+              <input value="Дмитрий Иванов" />
+            </div>
+            <div class="field">
+              <label>Группа</label>
+              <input value="592-1" />
+            </div>
+            <div class="field">
+              <label>Email</label>
+              <input value="student@example.com" />
+            </div>
+            <div class="field">
+              <label>Телефон</label>
+              <input value="+7 (900) 123-45-67" />
+            </div>
+            <div class="field field-full">
+              <label>О себе</label>
+              <textarea>Студент, интересующийся разработкой desktop- и web-приложений, проектированием баз данных и созданием пользовательских интерфейсов.</textarea>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <h3 class="card-title">Навыки</h3>
+              <p class="card-subtitle">Блок для визуального отображения ключевых компетенций.</p>
+            </div>
+            <span class="badge badge-neutral">Редактируемый список</span>
+          </div>
+
+          <div class="skills-wrap">
+            <div class="skill-pill">C#</div>
+            <div class="skill-pill">WPF</div>
+            <div class="skill-pill">HTML/CSS</div>
+            <div class="skill-pill">SQL</div>
+            <div class="skill-pill">SQLite</div>
+            <div class="skill-pill">PostgreSQL</div>
+            <div class="skill-pill">Python</div>
+            <div class="skill-pill">FastAPI</div>
+            <div class="skill-pill">UI-дизайн</div>
+            <div class="skill-pill">Git</div>
+            <div class="skill-pill">ER-диаграммы</div>
+            <div class="skill-pill">Документация</div>
+          </div>
+
+          <div style="margin-top:20px;">
+            <h3 class="section-title">Прогресс по направлениям</h3>
+            <div class="list">
+              <div class="progress-row">
+                <span>Программирование</span>
+                <div class="progress"><div class="progress-fill primary" style="width:88%;"></div></div>
+              </div>
+              <div class="progress-row">
+                <span>Базы данных</span>
+                <div class="progress"><div class="progress-fill purple" style="width:82%;"></div></div>
+              </div>
+              <div class="progress-row">
+                <span>Дизайн интерфейсов</span>
+                <div class="progress"><div class="progress-fill cyan" style="width:74%;"></div></div>
+              </div>
+              <div class="progress-row">
+                <span>Документация</span>
+                <div class="progress"><div class="progress-fill green" style="width:80%;"></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="card" style="margin-top:20px;">
+        <div class="card-header">
+          <div>
+            <h3 class="card-title">Проекты</h3>
+            <p class="card-subtitle">Основной блок портфолио с учебными и личными проектами.</p>
+          </div>
+          <span class="badge badge-primary">6 записей</span>
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Название</th>
+                <th>Тип</th>
+                <th>Технологии</th>
+                <th>Период</th>
+                <th>Статус</th>
+                <th>Результат</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>MultiApp для студентов</td>
+                <td>Дипломный проект</td>
+                <td>C#, WPF, SQLite</td>
+                <td>2026</td>
+                <td><span class="badge badge-primary">В разработке</span></td>
+                <td>Модули расписания, финансов, тренировок</td>
+              </tr>
+              <tr>
+                <td>Money Tracker</td>
+                <td>Личный проект</td>
+                <td>FastAPI, React, PostgreSQL</td>
+                <td>2025</td>
+                <td><span class="badge badge-cyan">Активен</span></td>
+                <td>Учет финансов и аналитика</td>
+              </tr>
+              <tr>
+                <td>VideoTeka</td>
+                <td>Учебный проект</td>
+                <td>C#, WPF, EF Core</td>
+                <td>2025</td>
+                <td><span class="badge badge-green">Завершен</span></td>
+                <td>Каталог фильмов и прокат</td>
+              </tr>
+              <tr>
+                <td>CarRent</td>
+                <td>Практика</td>
+                <td>Python, Tkinter, MySQL</td>
+                <td>2025</td>
+                <td><span class="badge badge-green">Завершен</span></td>
+                <td>Система аренды автомобилей</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="grid grid-2" style="margin-top:20px;">
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <h3 class="card-title">Сертификаты и достижения</h3>
+              <p class="card-subtitle">Блок для учебных достижений, курсов и грамот.</p>
+            </div>
+          </div>
+
+          <div class="list">
+            <div class="list-item">
+              <div class="list-main">
+                <h4>Сертификат по SQL и базам данных</h4>
+                <p>Образовательная платформа · 2025</p>
+              </div>
+              <span class="badge badge-primary">Сертификат</span>
+            </div>
+
+            <div class="list-item">
+              <div class="list-main">
+                <h4>Участие в хакатоне по разработке ИС</h4>
+                <p>Внутривузовское мероприятие · 2025</p>
+              </div>
+              <span class="badge badge-purple">Достижение</span>
+            </div>
+
+            <div class="list-item">
+              <div class="list-main">
+                <h4>Грамота за лучший учебный проект</h4>
+                <p>Колледж / университет · 2024</p>
+              </div>
+              <span class="badge badge-green">Награда</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <h3 class="card-title">Файлы портфолио</h3>
+              <p class="card-subtitle">Примеры прикрепленных материалов: PDF, изображения, ссылки, презентации.</p>
+            </div>
+          </div>
+
+          <div class="list">
+            <div class="list-item">
+              <div class="list-main">
+                <h4>Отчет_по_практике.pdf</h4>
+                <p>Документ · 2.4 МБ</p>
+              </div>
+              <span class="badge badge-neutral">PDF</span>
+            </div>
+
+            <div class="list-item">
+              <div class="list-main">
+                <h4>Презентация_диплома.pptx</h4>
+                <p>Презентация · 5.1 МБ</p>
+              </div>
+              <span class="badge badge-cyan">PPTX</span>
+            </div>
+
+            <div class="list-item">
+              <div class="list-main">
+                <h4>Макет_интерфейса.png</h4>
+                <p>Изображение · 1.8 МБ</p>
+              </div>
+              <span class="badge badge-purple">PNG</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="card" style="margin-top:20px;">
+        <div class="card-header">
+          <div>
+            <h3 class="card-title">Добавление новой записи в портфолио</h3>
+            <p class="card-subtitle">Форма для проекта, сертификата, достижения или файла.</p>
+          </div>
+        </div>
+
+        <div class="form-grid">
+          <div class="field">
+            <label>Тип записи</label>
+            <select>
+              <option>Проект</option>
+              <option>Сертификат</option>
+              <option>Достижение</option>
+              <option>Файл</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label>Название</label>
+            <input placeholder="Введите название записи" />
+          </div>
+
+          <div class="field">
+            <label>Дата</label>
+            <input type="date" />
+          </div>
+
+          <div class="field">
+            <label>Технологии / категория</label>
+            <input placeholder="Например: C#, SQL, UI/UX" />
+          </div>
+
+          <div class="field field-full">
+            <label>Описание</label>
+            <textarea placeholder="Краткое описание проекта, достижения или прикрепленного материала"></textarea>
+          </div>
+
+          <div class="field field-full">
+            <label>Ссылка на файл / репозиторий</label>
+            <input placeholder="https://..." />
+          </div>
+        </div>
+
+        <div style="margin-top:18px; display:flex; gap:12px; flex-wrap:wrap;">
+          <button class="btn btn-purple">Сохранить запись</button>
+          <button class="btn btn-secondary">Очистить форму</button>
+        </div>
+      </section>
+    </main>
+  </div>
+</body>
+</html>

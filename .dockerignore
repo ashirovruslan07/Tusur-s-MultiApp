@@ -1,0 +1,15 @@
+__pycache__/
+*.pyc
+*.pyo
+*.sqlite
+*.db
+.git/
+.venv/
+venv/
+макеты/
+*.docx
+*.png
+*.log
+Dockerfile
+docker-compose.yml
+README.md

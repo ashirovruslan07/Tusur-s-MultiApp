@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MultiApp — Финансы</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-logo">M</div>
+        <div>
+          <h1>MultiApp</h1>
+          <p>Органайзер студента</p>
+        </div>
+      </div>
+
+      <div class="menu-title">Модули</div>
+      <nav class="menu">
+        <a href="dashboard.html" class="menu-item ">Главная</a>
+<a href="schedule.html" class="menu-item ">Расписание</a>
+<a href="finance.html" class="menu-item active">Финансы</a>
+<a href="workouts.html" class="menu-item ">Тренировки</a>
+<a href="planner.html" class="menu-item ">Ежедневник</a>
+<a href="portfolio.html" class="menu-item">Портфолио</a>
+<a href="profile.html" class="menu-item ">Профиль</a>
+<a href="settings.html" class="menu-item ">Настройки</a>
+      </nav>
+
+      <div class="sidebar-card">
+        <h3>Текущая неделя</h3>
+        <p>Четная · 5 учебная неделя</p>
+        <span class="badge badge-sync">Синхронизация расписания включена</span>
+      </div>
+    </aside>
+
+    <main class="content">
+      
+<header class="topbar">
+  <div>
+    <h2>Модуль «Финансы»</h2>
+    <p>Интерфейс учёта счетов, операций, категорий и аналитики личного бюджета студента.</p>
+  </div>
+  <div class="top-actions">
+    <button class="btn btn-green">Добавить операцию</button>
+    <button class="btn btn-secondary">Экспорт</button>
+  </div>
+</header>
+
+<section class="grid grid-4">
+  <div class="kpi kpi-green"><h3>Общий баланс</h3><strong>18 450 ₽</strong><small>На всех счетах</small></div>
+  <div class="kpi kpi-primary"><h3>Доходы</h3><strong>24 000 ₽</strong><small>За март</small></div>
+  <div class="kpi kpi-purple"><h3>Расходы</h3><strong>9 870 ₽</strong><small>За март</small></div>
+  <div class="kpi kpi-cyan"><h3>Накопления</h3><strong>6 200 ₽</strong><small>Цель: ноутбук</small></div>
+</section>
+
+<section class="grid grid-2" style="margin-top:20px;">
+  <div class="card">
+    <div class="card-header">
+      <div>
+        <h3 class="card-title">Мои счета</h3>
+        <p class="card-subtitle">Карты, наличные и накопительные счета.</p>
+      </div>
+      <span class="badge badge-green">3 активных</span>
+    </div>
+    <div class="list">
+      <div class="list-item"><div class="list-main"><h4>Сбербанк</h4><p>Карта · RUB</p></div><strong>12 300 ₽</strong></div>
+      <div class="list-item"><div class="list-main"><h4>Наличные</h4><p>Личные средства</p></div><strong>2 150 ₽</strong></div>
+      <div class="list-item"><div class="list-main"><h4>Накопительный счёт</h4><p>Цель: техника</p></div><strong>4 000 ₽</strong></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <div>
+        <h3 class="card-title">Структура расходов</h3>
+        <p class="card-subtitle">Демонстрационный график по категориям.</p>
+      </div>
+      <span class="badge badge-neutral">Месяц</span>
+    </div>
+    <div class="chart">
+      <div class="chart-bars">
+        <div class="bar green" style="height:78%"></div>
+        <div class="bar purple" style="height:54%"></div>
+        <div class="bar cyan" style="height:62%"></div>
+        <div class="bar" style="height:41%"></div>
+        <div class="bar green" style="height:36%"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="card" style="margin-top:20px;">
+  <div class="card-header">
+    <div>
+      <h3 class="card-title">Последние операции</h3>
+      <p class="card-subtitle">Таблица доходов и расходов с фильтрацией по счёту и категории.</p>
+    </div>
+  </div>
+  <div class="form-grid" style="margin-bottom:16px;">
+    <div class="field"><label>Счёт</label><select><option>Все счета</option></select></div>
+    <div class="field"><label>Категория</label><select><option>Все категории</option></select></div>
+    <div class="field"><label>Тип</label><select><option>Все операции</option></select></div>
+    <div class="field"><label>Период</label><input value="01.03.2026 — 31.03.2026"></div>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Дата</th>
+          <th>Тип</th>
+          <th>Категория</th>
+          <th>Счёт</th>
+          <th>Описание</th>
+          <th>Сумма</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>09.03.2026</td><td>Расход</td><td>Продукты</td><td>Сбербанк</td><td>Супермаркет</td><td>890 ₽</td></tr>
+        <tr><td>08.03.2026</td><td>Доход</td><td>Стипендия</td><td>Сбербанк</td><td>Ежемесячная выплата</td><td>3 500 ₽</td></tr>
+        <tr><td>07.03.2026</td><td>Расход</td><td>Транспорт</td><td>Сбербанк</td><td>Проезд</td><td>120 ₽</td></tr>
+        <tr><td>06.03.2026</td><td>Перевод</td><td>—</td><td>Сбербанк → Накопительный</td><td>Пополнение</td><td>1 000 ₽</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+    </main>
+  </div>
+</body>
+</html>
