@@ -13,7 +13,6 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY server ./server
 COPY public ./public
-COPY sql.txt ./sql.txt
 
 RUN mkdir -p /app/data
 

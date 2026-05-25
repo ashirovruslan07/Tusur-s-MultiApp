@@ -140,6 +140,314 @@ def migrate(conn: sqlite3.Connection) -> None:
             FOREIGN KEY (user_id) REFERENCES Users(user_id)
         );
 
+        CREATE TABLE IF NOT EXISTS Faculties (
+            faculty_id INTEGER PRIMARY KEY AUTOINCREMENT,
+            full_name TEXT NOT NULL,
+            abbreviation TEXT NOT NULL,
+            site_code TEXT
+        );
+
+        CREATE TABLE IF NOT EXISTS Courses (
+            course_id INTEGER PRIMARY KEY AUTOINCREMENT,
+            course_number INTEGER NOT NULL UNIQUE CHECK (course_number BETWEEN 1 AND 6)
+        );
+
+        CREATE TABLE IF NOT EXISTS Groups (
+            group_id INTEGER PRIMARY KEY AUTOINCREMENT,
+            faculty_id INTEGER NOT NULL,
+            course_id INTEGER NOT NULL,
+            group_name TEXT NOT NULL UNIQUE,
+            FOREIGN KEY (faculty_id) REFERENCES Faculties(faculty_id),
+            FOREIGN KEY (course_id) REFERENCES Courses(course_id)
+        );
+
+        CREATE TABLE IF NOT EXISTS Student_Profile (
+            profile_id INTEGER PRIMARY KEY AUTOINCREMENT,
+            full_name TEXT NOT NULL,
+            group_id INTEGER,
+            email TEXT,
+            phone TEXT,
+            user_id INTEGER,
+            bio TEXT,
+            specialization TEXT,
+            FOREIGN KEY (group_id) REFERENCES Groups(group_id),
+            FOREIGN KEY (user_id) REFERENCES Users(user_id)
+        );
+
+        CREATE TABLE IF NOT EXISTS App_Settings (
+            setting_id INTEGER PRIMARY KEY AUTOINCREMENT,
+            selected_group_id INTEGER,
+            selected_week_type TEXT
+                CHECK (selected_week_type IN ('четная', 'нечетная', 'обычная', 'числитель', 'знаменатель')),
+            theme TEXT DEFAULT 'light' CHECK (theme IN ('light', 'dark')),
+            notifications_enabled INTEGER NOT NULL DEFAULT 1 CHECK (notifications_enabled IN (0, 1)),
+            user_id INTEGER,
+            language TEXT DEFAULT 'ru',
+            date_format TEXT DEFAULT 'DD.MM.YYYY',
+            auto_update_schedule INTEGER NOT NULL DEFAULT 1,
+            lesson_reminder_minutes INTEGER NOT NULL DEFAULT 15,
+            FOREIGN KEY (selected_group_id) REFERENCES Groups(group_id),
+            FOREIGN KEY (user_id) REFERENCES Users(user_id)
+        );
+
+        CREATE TABLE IF NOT EXISTS Weekly_Schedule (
+            schedule_id INTEGER PRIMARY KEY AUTOINCREMENT,
+            group_id INTEGER NOT NULL,
+            week_type TEXT NOT NULL
+                CHECK (week_type IN ('четная', 'нечетная', 'обычная', 'числитель', 'знаменатель')),
+            source_week_id INTEGER,
+            week_number INTEGER,
+            starts_at TEXT,
+            synced_at TEXT,
+            FOREIGN KEY (group_id) REFERENCES Groups(group_id)
+        );
+
+        CREATE TABLE IF NOT EXISTS Daily_Schedule (
+            daily_schedule_id INTEGER PRIMARY KEY AUTOINCREMENT,
+            schedule_id INTEGER NOT NULL,
+            lesson_number INTEGER NOT NULL,
+            day_number INTEGER NOT NULL CHECK (day_number BETWEEN 1 AND 7),
+            discipline TEXT NOT NULL,
+            lesson_type TEXT NOT NULL,
+            auditorium TEXT,
+            teacher_name TEXT,
+            start_time TEXT,
+            end_time TEXT,
+            FOREIGN KEY (schedule_id) REFERENCES Weekly_Schedule(schedule_id)
+        );
+
+        CREATE TABLE IF NOT EXISTS Accounts (
+            account_id INTEGER PRIMARY KEY AUTOINCREMENT,
+            account_name TEXT NOT NULL,
+            account_type TEXT NOT NULL CHECK (account_type IN ('карта', 'наличные', 'счет', 'вклад')),
+            balance REAL NOT NULL DEFAULT 0,
+            currency TEXT NOT NULL DEFAULT 'RUB',
+            is_active INTEGER NOT NULL DEFAULT 1 CHECK (is_active IN (0, 1)),
+            user_id INTEGER,
+            FOREIGN KEY (user_id) REFERENCES Users(user_id)
+        );
+
+        CREATE TABLE IF NOT EXISTS Categories (
+            category_id INTEGER PRIMARY KEY AUTOINCREMENT,
+            category_name TEXT NOT NULL,
+            category_type TEXT NOT NULL CHECK (category_type IN ('income', 'expense')),
+            icon_name TEXT,
+            color TEXT,
+            user_id INTEGER,
+            FOREIGN KEY (user_id) REFERENCES Users(user_id)
+        );
+
+        CREATE TABLE IF NOT EXISTS Transactions (
+            transaction_id INTEGER PRIMARY KEY AUTOINCREMENT,
+            account_id INTEGER NOT NULL,
+            category_id INTEGER NOT NULL,
+            transaction_type TEXT NOT NULL CHECK (transaction_type IN ('income', 'expense')),
+            amount REAL NOT NULL CHECK (amount >= 0),
+            description TEXT,
+            transaction_date TEXT NOT NULL,
+            created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+            user_id INTEGER,
+            FOREIGN KEY (account_id) REFERENCES Accounts(account_id),
+            FOREIGN KEY (category_id) REFERENCES Categories(category_id),
+            FOREIGN KEY (user_id) REFERENCES Users(user_id)
+        );
+
+        CREATE TABLE IF NOT EXISTS Transfers (
+            transfer_id INTEGER PRIMARY KEY AUTOINCREMENT,
+            from_account_id INTEGER NOT NULL,
+            to_account_id INTEGER NOT NULL,
+            amount REAL NOT NULL CHECK (amount > 0),
+            transfer_date TEXT NOT NULL,
+            comment TEXT,
+            user_id INTEGER,
+            FOREIGN KEY (from_account_id) REFERENCES Accounts(account_id),
+            FOREIGN KEY (to_account_id) REFERENCES Accounts(account_id),
+            FOREIGN KEY (user_id) REFERENCES Users(user_id),
+            CHECK (from_account_id <> to_account_id)
+        );
+
+        CREATE TABLE IF NOT EXISTS Workout_Types (
+            workout_type_id INTEGER PRIMARY KEY AUTOINCREMENT,
+            type_name TEXT NOT NULL UNIQUE
+        );
+
+        CREATE TABLE IF NOT EXISTS Exercises (
+            exercise_id INTEGER PRIMARY KEY AUTOINCREMENT,
+            exercise_name TEXT NOT NULL,
+            muscle_group TEXT,
+            exercise_type TEXT
+        );
+
+        CREATE TABLE IF NOT EXISTS Workout_Plans (
+            plan_id INTEGER PRIMARY KEY AUTOINCREMENT,
+            plan_name TEXT NOT NULL,
+            workout_type_id INTEGER NOT NULL,
+            day_number INTEGER NOT NULL CHECK (day_number BETWEEN 1 AND 7),
+            description TEXT,
+            user_id INTEGER,
+            FOREIGN KEY (workout_type_id) REFERENCES Workout_Types(workout_type_id),
+            FOREIGN KEY (user_id) REFERENCES Users(user_id)
+        );
+
+        CREATE TABLE IF NOT EXISTS Plan_Exercises (
+            plan_exercise_id INTEGER PRIMARY KEY AUTOINCREMENT,
+            plan_id INTEGER NOT NULL,
+            exercise_id INTEGER NOT NULL,
+            sets_count INTEGER,
+            reps_count INTEGER,
+            duration_minutes INTEGER,
+            exercise_order INTEGER NOT NULL,
+            user_id INTEGER,
+            FOREIGN KEY (plan_id) REFERENCES Workout_Plans(plan_id),
+            FOREIGN KEY (exercise_id) REFERENCES Exercises(exercise_id),
+            FOREIGN KEY (user_id) REFERENCES Users(user_id)
+        );
+
+        CREATE TABLE IF NOT EXISTS Workout_Logs (
+            workout_log_id INTEGER PRIMARY KEY AUTOINCREMENT,
+            plan_id INTEGER,
+            workout_date TEXT NOT NULL,
+            duration_minutes INTEGER,
+            calories_burned INTEGER,
+            notes TEXT,
+            user_id INTEGER,
+            FOREIGN KEY (plan_id) REFERENCES Workout_Plans(plan_id),
+            FOREIGN KEY (user_id) REFERENCES Users(user_id)
+        );
+
+        CREATE TABLE IF NOT EXISTS Workout_Log_Exercises (
+            log_exercise_id INTEGER PRIMARY KEY AUTOINCREMENT,
+            workout_log_id INTEGER NOT NULL,
+            exercise_id INTEGER NOT NULL,
+            sets_done INTEGER,
+            reps_done INTEGER,
+            weight_used REAL,
+            duration_minutes INTEGER,
+            user_id INTEGER,
+            FOREIGN KEY (workout_log_id) REFERENCES Workout_Logs(workout_log_id),
+            FOREIGN KEY (exercise_id) REFERENCES Exercises(exercise_id),
+            FOREIGN KEY (user_id) REFERENCES Users(user_id)
+        );
+
+        CREATE TABLE IF NOT EXISTS Planner_Categories (
+            planner_category_id INTEGER PRIMARY KEY AUTOINCREMENT,
+            category_name TEXT NOT NULL UNIQUE
+        );
+
+        CREATE TABLE IF NOT EXISTS Tasks (
+            task_id INTEGER PRIMARY KEY AUTOINCREMENT,
+            planner_category_id INTEGER,
+            title TEXT NOT NULL,
+            description TEXT,
+            priority TEXT NOT NULL DEFAULT 'medium' CHECK (priority IN ('low', 'medium', 'high')),
+            status TEXT NOT NULL DEFAULT 'planned' CHECK (status IN ('planned', 'in_progress', 'done')),
+            due_date TEXT,
+            created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+            user_id INTEGER,
+            FOREIGN KEY (planner_category_id) REFERENCES Planner_Categories(planner_category_id),
+            FOREIGN KEY (user_id) REFERENCES Users(user_id)
+        );
+
+        CREATE TABLE IF NOT EXISTS Events (
+            event_id INTEGER PRIMARY KEY AUTOINCREMENT,
+            planner_category_id INTEGER,
+            title TEXT NOT NULL,
+            description TEXT,
+            event_date TEXT NOT NULL,
+            start_time TEXT,
+            end_time TEXT,
+            location TEXT,
+            user_id INTEGER,
+            FOREIGN KEY (planner_category_id) REFERENCES Planner_Categories(planner_category_id),
+            FOREIGN KEY (user_id) REFERENCES Users(user_id)
+        );
+
+        CREATE TABLE IF NOT EXISTS Notes (
+            note_id INTEGER PRIMARY KEY AUTOINCREMENT,
+            title TEXT NOT NULL,
+            content TEXT,
+            created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+            updated_at TEXT DEFAULT CURRENT_TIMESTAMP,
+            user_id INTEGER,
+            FOREIGN KEY (user_id) REFERENCES Users(user_id)
+        );
+
+        CREATE TABLE IF NOT EXISTS Portfolio_Categories (
+            portfolio_category_id INTEGER PRIMARY KEY AUTOINCREMENT,
+            category_name TEXT NOT NULL UNIQUE
+        );
+
+        CREATE TABLE IF NOT EXISTS Portfolio_Projects (
+            project_id INTEGER PRIMARY KEY AUTOINCREMENT,
+            portfolio_category_id INTEGER,
+            title TEXT NOT NULL,
+            project_type TEXT NOT NULL CHECK (project_type IN ('учебный', 'личный', 'дипломный', 'практика')),
+            technologies TEXT,
+            description TEXT,
+            start_date TEXT,
+            end_date TEXT,
+            status TEXT NOT NULL DEFAULT 'planned' CHECK (status IN ('planned', 'in_progress', 'completed')),
+            result_text TEXT,
+            repository_url TEXT,
+            project_url TEXT,
+            created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+            user_id INTEGER,
+            FOREIGN KEY (portfolio_category_id) REFERENCES Portfolio_Categories(portfolio_category_id),
+            FOREIGN KEY (user_id) REFERENCES Users(user_id)
+        );
+
+        CREATE TABLE IF NOT EXISTS Portfolio_Achievements (
+            achievement_id INTEGER PRIMARY KEY AUTOINCREMENT,
+            portfolio_category_id INTEGER,
+            title TEXT NOT NULL,
+            achievement_type TEXT NOT NULL CHECK (achievement_type IN ('достижение', 'награда', 'грамота', 'участие')),
+            issuer TEXT,
+            achievement_date TEXT,
+            description TEXT,
+            created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+            user_id INTEGER,
+            FOREIGN KEY (portfolio_category_id) REFERENCES Portfolio_Categories(portfolio_category_id),
+            FOREIGN KEY (user_id) REFERENCES Users(user_id)
+        );
+
+        CREATE TABLE IF NOT EXISTS Portfolio_Certificates (
+            certificate_id INTEGER PRIMARY KEY AUTOINCREMENT,
+            portfolio_category_id INTEGER,
+            title TEXT NOT NULL,
+            organization TEXT,
+            issue_date TEXT,
+            expiry_date TEXT,
+            certificate_number TEXT,
+            description TEXT,
+            file_path TEXT,
+            created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+            user_id INTEGER,
+            FOREIGN KEY (portfolio_category_id) REFERENCES Portfolio_Categories(portfolio_category_id),
+            FOREIGN KEY (user_id) REFERENCES Users(user_id)
+        );
+
+        CREATE TABLE IF NOT EXISTS Portfolio_Files (
+            file_id INTEGER PRIMARY KEY AUTOINCREMENT,
+            project_id INTEGER,
+            achievement_id INTEGER,
+            certificate_id INTEGER,
+            file_name TEXT NOT NULL,
+            file_type TEXT,
+            file_path TEXT NOT NULL,
+            file_size INTEGER,
+            uploaded_at TEXT DEFAULT CURRENT_TIMESTAMP,
+            user_id INTEGER,
+            FOREIGN KEY (project_id) REFERENCES Portfolio_Projects(project_id),
+            FOREIGN KEY (achievement_id) REFERENCES Portfolio_Achievements(achievement_id),
+            FOREIGN KEY (certificate_id) REFERENCES Portfolio_Certificates(certificate_id),
+            FOREIGN KEY (user_id) REFERENCES Users(user_id),
+            CHECK (
+                (project_id IS NOT NULL AND achievement_id IS NULL AND certificate_id IS NULL) OR
+                (project_id IS NULL AND achievement_id IS NOT NULL AND certificate_id IS NULL) OR
+                (project_id IS NULL AND achievement_id IS NULL AND certificate_id IS NOT NULL)
+            )
+        );
+
         CREATE TABLE IF NOT EXISTS Portfolio_Skills (
             skill_id INTEGER PRIMARY KEY AUTOINCREMENT,
             user_id INTEGER NOT NULL,

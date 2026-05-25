@@ -14,5 +14,22 @@ services:
       - multiapp-data:/app/data
     restart: unless-stopped
 
+  tests:
+    build: .
+    working_dir: /app
+    environment:
+      MULTIAPP_DB_PATH: /tmp/multiapp_test.sqlite
+      MULTIAPP_TIMEZONE: Asia/Tomsk
+      PIP_DISABLE_PIP_VERSION_CHECK: "1"
+      PIP_ROOT_USER_ACTION: ignore
+      PYTHONPATH: /app
+      TZ: Asia/Tomsk
+    volumes:
+      - .:/app
+    entrypoint: ["sh", "-c", "pip install -r requirements-dev.txt >/dev/null && exec \"$@\"", "--"]
+    command: ["pytest"]
+    profiles:
+      - tests
+
 volumes:
   multiapp-data:
