@@ -3,3 +3,4 @@ uvicorn[standard]>=0.34
 beautifulsoup4>=4.12
 requests>=2.31
 tzdata>=2024.1; platform_system == "Windows"
+psycopg[binary]>=3.2

@@ -417,7 +417,17 @@ async function loadRoute(route) {
   state.notice = "";
   try {
     state.data = await api(routes[route].api);
-    if (route === "profile") state.profile = state.data.profile;
+    if (route === "profile") {
+      state.profile = state.data.profile;
+      const profile = state.data.profile || {};
+      if (state.profileFilters.sourceGroupId !== profile.group_id) {
+        state.profileFilters = {
+          sourceGroupId: profile.group_id,
+          facultyId: profile.faculty_id || "",
+          courseNumber: profile.course_number || ""
+        };
+      }
+    }
     if (state.data?.settings) applyTheme(state.data.settings.theme);
     renderRoute();
   } catch (error) {
@@ -1448,8 +1458,13 @@ function profileGroupSelect(groups = [], selected) {
 
 function filteredProfileGroups(metadata, profile) {
   const groups = metadata.groups || [];
-  const facultyId = Number(state.profileFilters.facultyId || profile.faculty_id || groups[0]?.faculty_id || 0);
-  const courseNumber = Number(state.profileFilters.courseNumber || profile.course_number || groups.find((group) => Number(group.faculty_id) === facultyId)?.course_number || 1);
+  const selectedGroup = groups.find((group) => Number(group.group_id) === Number(profile.group_id));
+  const profileFacultyId = selectedGroup?.faculty_id || profile.faculty_id;
+  const profileCourseNumber = selectedGroup?.course_number || profile.course_number;
+  const filterFacultyId = state.profileFilters.facultyId;
+  const filterCourseNumber = state.profileFilters.courseNumber;
+  const facultyId = Number(filterFacultyId || profileFacultyId || groups[0]?.faculty_id || 0);
+  const courseNumber = Number(filterCourseNumber || profileCourseNumber || groups.find((group) => Number(group.faculty_id) === facultyId)?.course_number || 1);
   return {
     facultyId,
     courseNumber,
@@ -1620,6 +1635,7 @@ function renderAdminSchedule(data) {
   const pointGroups = groups.filter((group) => group.faculty_code === pointFaculty);
   const selectedGroups = pointFaculty ? pointGroups : groups;
   const schedules = data.schedules || [];
+  const weeks = data.weeks || [];
   const summary = data.summary || {};
   const settings = data.syncSettings || {};
   const logs = data.syncLogs || [];
@@ -1717,6 +1733,34 @@ function renderAdminSchedule(data) {
             ${renderAdminGroupCoverageRows(filtered)}
           </tbody>
         </table>
+      </div>
+    </section>
+
+    <section class="grid grid-2 section-gap">
+      <div class="card">
+        <div class="card-header"><div><h3 class="card-title">Недели расписания</h3><p class="card-subtitle">Контроль дат, номеров недель и объема синхронизации.</p></div></div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Неделя</th><th>Период</th><th>Тип</th><th>Групп</th><th>Пар</th></tr></thead>
+            <tbody>
+              ${weeks.map((week) => `
+                <tr>
+                  <td><strong>${week.week_number ? `№ ${week.week_number}` : "Без номера"}</strong></td>
+                  <td>${dateRu(week.starts_at)} - ${dateRu(week.ends_at)}</td>
+                  <td><span class="badge badge-neutral">${escapeHtml(week.week_type || "обычная")}</span></td>
+                  <td>${week.group_count || 0}</td>
+                  <td>${week.lesson_count || 0}</td>
+                </tr>
+              `).join("") || `<tr><td colspan="5"><div class="empty">Недели пока не сохранены.</div></td></tr>`}
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header"><div><h3 class="card-title">Последние расписания</h3><p class="card-subtitle">Недавно сохраненные группы и периоды.</p></div></div>
+        <div class="list">
+          ${schedules.slice(0, 8).map((schedule) => `<div class="list-item"><div class="list-main"><h4>${escapeHtml(schedule.group_name || "Группа")}</h4><p>${dateRu(schedule.starts_at)} - ${dateRu(schedule.ends_at)} · ${escapeHtml(schedule.faculty_name || "")} · пар ${schedule.lesson_count || 0}</p></div><span class="badge badge-cyan">${schedule.week_number ? `№ ${schedule.week_number}` : escapeHtml(schedule.week_type || "")}</span></div>`).join("") || `<div class="empty">Расписаний пока нет.</div>`}
+        </div>
       </div>
     </section>
 

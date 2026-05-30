@@ -78,7 +78,10 @@ def test_profile_can_select_existing_group(registered_client):
     response = registered_client.patch("/api/profile", json={"group_id": group["group_id"]})
 
     assert response.status_code == 200
-    assert response.json()["profile"]["group_id"] == group["group_id"]
+    profile = response.json()["profile"]
+    assert profile["group_id"] == group["group_id"]
+    assert profile["faculty_id"] == group["faculty_id"]
+    assert profile["course_number"] == group["course_number"]
 
 
 def test_profile_rejects_unknown_group(registered_client):

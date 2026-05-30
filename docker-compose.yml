@@ -7,11 +7,34 @@ services:
     ports:
       - "8000:8000"
     environment:
+      DATABASE_URL: postgresql://multiapp:multiapp@postgres:5432/multiapp
       MULTIAPP_DB_PATH: /app/data/multi_app.sqlite
       MULTIAPP_TIMEZONE: Asia/Tomsk
       TZ: Asia/Tomsk
     volumes:
       - multiapp-data:/app/data
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: multiapp-postgres
+    environment:
+      POSTGRES_DB: multiapp
+      POSTGRES_USER: multiapp
+      POSTGRES_PASSWORD: multiapp
+      TZ: Asia/Tomsk
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U multiapp -d multiapp"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
     restart: unless-stopped
 
   tests:
@@ -33,3 +56,4 @@ services:
 
 volumes:
   multiapp-data:
+  postgres-data:
