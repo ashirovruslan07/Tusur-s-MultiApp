@@ -64,6 +64,8 @@ body {
   margin: 0;
   min-height: 100vh;
   font-family: "Segoe UI", Inter, Arial, sans-serif;
+  font-size: 18px;
+  line-height: 1.45;
   background: var(--bg);
   color: var(--text);
 }
@@ -127,7 +129,7 @@ button { border: 0; }
   border-radius: 8px;
   background: var(--surface-soft);
   color: var(--muted);
-  font-size: 13px;
+  font-size: 16px;
 }
 
 .auth-help strong {
@@ -172,14 +174,14 @@ button { border: 0; }
   color: #fff;
 }
 
-.brand h1 { font-size: 22px; }
-.brand p { color: rgba(255, 255, 255, .78); font-size: 14px; }
+.brand h1 { font-size: 26px; }
+.brand p { color: rgba(255, 255, 255, .78); font-size: 17px; }
 
 .menu-title {
   padding: 0 10px;
   color: rgba(255, 255, 255, .66);
   text-transform: uppercase;
-  font-size: 12px;
+  font-size: 16px;
   letter-spacing: .08em;
 }
 
@@ -211,7 +213,7 @@ button { border: 0; }
   border: 1px solid rgba(255, 255, 255, .12);
 }
 
-.sidebar-card h3 { margin: 0 0 8px; font-size: 16px; }
+.sidebar-card h3 { margin: 0 0 8px; font-size: 20px; }
 .sidebar-card p { margin: 0 0 12px; color: rgba(255,255,255,.82); }
 
 .content {
@@ -227,7 +229,7 @@ button { border: 0; }
   margin-bottom: 22px;
 }
 
-.topbar h2 { font-size: 30px; }
+.topbar h2 { font-size: 38px; }
 .top-actions {
   display: flex;
   align-items: center;
@@ -301,7 +303,7 @@ button { border: 0; }
 
 .card-title, .section-title {
   margin: 0;
-  font-size: 20px;
+  font-size: 26px;
 }
 
 .card-subtitle, .muted, .stat-note {
@@ -310,7 +312,7 @@ button { border: 0; }
 
 .card-subtitle {
   margin: 6px 0 0;
-  font-size: 14px;
+  font-size: 18px;
 }
 
 .kpi {
@@ -320,14 +322,14 @@ button { border: 0; }
 
 .kpi h3 {
   margin: 0 0 9px;
-  font-size: 14px;
+  font-size: 18px;
   font-weight: 700;
   opacity: .92;
 }
 
 .kpi strong {
   display: block;
-  font-size: 31px;
+  font-size: 40px;
   line-height: 1.12;
 }
 
@@ -379,9 +381,9 @@ button { border: 0; }
 }
 
 .stat-box { padding: 13px; }
-.stat-label { color: var(--muted); font-size: 13px; margin-bottom: 6px; }
-.stat-value { font-size: 23px; font-weight: 800; }
-.stat-note { font-size: 13px; margin-top: 5px; }
+.stat-label { color: var(--muted); font-size: 16px; margin-bottom: 6px; }
+.stat-value { font-size: 30px; font-weight: 800; }
+.stat-note { font-size: 16px; margin-top: 5px; }
 
 .list {
   display: flex;
@@ -397,8 +399,8 @@ button { border: 0; }
   padding: 13px 14px;
 }
 
-.list-main h4 { margin: 0 0 5px; font-size: 16px; }
-.list-main p { margin: 0; color: var(--muted); font-size: 14px; }
+.list-main h4 { margin: 0 0 5px; font-size: 20px; }
+.list-main p { margin: 0; color: var(--muted); font-size: 17px; }
 
 .row-actions {
   display: flex;
@@ -451,12 +453,12 @@ button { border: 0; }
 
 .workout-calendar .day-head strong {
   color: var(--text);
-  font-size: 16px;
+  font-size: 20px;
 }
 
 .workout-calendar .day-head span {
   color: var(--muted);
-  font-size: 12px;
+  font-size: 16px;
 }
 
 .workout-mini {
@@ -468,12 +470,12 @@ button { border: 0; }
 }
 
 .workout-mini strong {
-  font-size: 13px;
+  font-size: 17px;
 }
 
 .workout-mini span {
   color: var(--muted);
-  font-size: 12px;
+  font-size: 16px;
 }
 
 .workout-plan-item {
@@ -509,19 +511,19 @@ button { border: 0; }
 .time-chip span {
   display: block;
   color: var(--muted);
-  font-size: 12px;
+  font-size: 16px;
   font-weight: 700;
 }
 
 .timeline-main h4 {
   margin: 0 0 6px;
-  font-size: 17px;
+  font-size: 21px;
 }
 
 .timeline-main p {
   margin: 0;
   color: var(--muted);
-  font-size: 14px;
+  font-size: 17px;
 }
 
 .mini-metrics {
@@ -541,12 +543,12 @@ button { border: 0; }
 .mini-metrics span {
   display: block;
   color: var(--muted);
-  font-size: 12px;
+  font-size: 16px;
   margin-bottom: 6px;
 }
 
 .mini-metrics strong {
-  font-size: 18px;
+  font-size: 23px;
 }
 
 .amount-income { color: #577300; }
@@ -560,7 +562,7 @@ button { border: 0; }
   gap: 6px;
   border-radius: 999px;
   padding: 7px 10px;
-  font-size: 12px;
+  font-size: 16px;
   font-weight: 800;
   white-space: nowrap;
 }
@@ -612,8 +614,8 @@ button { border: 0; }
 .btn-ghost { background: transparent; color: inherit; border-color: transparent; }
 
 .icon-btn {
-  width: 34px;
-  height: 34px;
+  width: 42px;
+  height: 42px;
   display: inline-grid;
   place-items: center;
   background: var(--surface);
@@ -634,7 +636,7 @@ button { border: 0; }
 }
 
 .field label {
-  font-size: 13px;
+  font-size: 16px;
   font-weight: 800;
   color: var(--text);
 }
@@ -648,7 +650,7 @@ button { border: 0; }
   min-width: 0;
   border: 1px solid var(--line);
   border-radius: 8px;
-  padding: 11px 12px;
+  padding: 13px 14px;
   background: var(--input-bg);
   color: var(--text);
   outline: none;
@@ -700,7 +702,7 @@ th, td {
 th {
   background: var(--table-head);
   color: var(--table-head-text);
-  font-size: 12px;
+  font-size: 16px;
   text-transform: uppercase;
   letter-spacing: .04em;
 }
@@ -711,7 +713,7 @@ tr:last-child td { border-bottom: 0; }
   padding: 11px 14px;
   background: rgba(60, 56, 141, .10);
   color: var(--primary);
-  font-size: 13px;
+  font-size: 16px;
   font-weight: 900;
   letter-spacing: .02em;
   text-transform: uppercase;
@@ -899,7 +901,7 @@ tr:last-child td { border-bottom: 0; }
 
 .sync-toast-head span {
   color: var(--muted);
-  font-size: 12px;
+  font-size: 16px;
   font-weight: 800;
   text-transform: uppercase;
 }
@@ -907,7 +909,7 @@ tr:last-child td { border-bottom: 0; }
 .sync-toast p {
   margin: 0;
   color: var(--muted);
-  font-size: 13px;
+  font-size: 16px;
   font-weight: 600;
   line-height: 1.4;
 }
@@ -955,7 +957,7 @@ tr:last-child td { border-bottom: 0; }
 
 .schedule-board {
   display: grid;
-  grid-template-columns: 90px repeat(6, minmax(142px, 1fr));
+  grid-template-columns: 108px repeat(6, minmax(180px, 1fr));
   border: 1px solid var(--schedule-line);
   border-radius: 8px;
   overflow: auto;
@@ -983,12 +985,12 @@ tr:last-child td { border-bottom: 0; }
 }
 
 .schedule-head strong {
-  font-size: 15px;
+  font-size: 18px;
   color: var(--text);
 }
 
 .schedule-head span {
-  font-size: 12px;
+  font-size: 16px;
   color: var(--muted);
 }
 
@@ -1013,7 +1015,7 @@ tr:last-child td { border-bottom: 0; }
 }
 
 .schedule-cell {
-  min-height: 76px;
+  min-height: 94px;
   padding: 0;
   background: var(--surface);
 }
@@ -1024,7 +1026,7 @@ tr:last-child td { border-bottom: 0; }
 
 .lesson-card {
   height: 100%;
-  min-height: 76px;
+  min-height: 94px;
   display: grid;
   place-items: center;
   align-content: center;
@@ -1038,7 +1040,7 @@ tr:last-child td { border-bottom: 0; }
 .lesson-card h4 {
   margin: 0;
   max-width: 100%;
-  font-size: 14px;
+  font-size: 17px;
   line-height: 1.15;
   color: #111;
   text-decoration: underline;
@@ -1050,7 +1052,7 @@ tr:last-child td { border-bottom: 0; }
 .lesson-card span,
 .lesson-card small {
   max-width: 100%;
-  font-size: 12px;
+  font-size: 16px;
   line-height: 1.2;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -1074,7 +1076,7 @@ tr:last-child td { border-bottom: 0; }
   border: 1px solid var(--schedule-line);
   border-radius: 4px;
   padding: 7px 10px;
-  font-size: 13px;
+  font-size: 16px;
   font-weight: 800;
 }
 
