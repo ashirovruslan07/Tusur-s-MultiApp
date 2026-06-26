@@ -33,6 +33,26 @@ def test_admin_schedule_payload_contains_summary_and_logs(admin_client):
     assert payload["summary"]["total_groups"] >= 1
 
 
+def test_admin_schedule_payload_contains_current_week_id(admin_client, app_module):
+    with app_module.db.transaction() as conn:
+        app_module.upsert_schedule_week(
+            conn,
+            {
+                "week_id": 777,
+                "week_number": 20,
+                "week_type": "четная",
+                "starts_at": app_module.fallback_week_start(),
+            },
+        )
+
+    response = admin_client.get("/api/admin/schedule")
+    assert response.status_code == 200
+    payload = response.json()
+
+    assert payload["currentWeek"]["source_week_id"] == 777
+    assert payload["currentWeek"]["starts_at"] == app_module.fallback_week_start().isoformat()
+
+
 def test_schedule_sync_targets_current_and_next_weeks(app_module):
     assert app_module.target_offsets("current") == [0]
     assert app_module.target_offsets("next") == [1]
@@ -52,6 +72,31 @@ def test_schedule_week_id_and_type_are_completed_for_future_weeks(app_module):
     assert week["week_number"] == 15
     assert week["week_type"] == "нечетная"
     assert week["starts_at"] == app_module.fallback_week_start(3)
+
+
+def test_next_week_overrides_stale_parser_week_metadata(app_module):
+    current_week = SimpleNamespace(
+        week_id=828,
+        week_number=43,
+        week_type="нечетная",
+        starts_at=app_module.date(2026, 6, 22),
+    )
+
+    week = app_module.complete_week_info(
+        {
+            "week_id": 828,
+            "week_number": 43,
+            "week_type": "нечетная",
+            "starts_at": app_module.date(2026, 6, 22),
+        },
+        current_week,
+        1,
+    )
+
+    assert week["week_id"] == 829
+    assert week["week_number"] == 44
+    assert week["week_type"] == "четная"
+    assert week["starts_at"] == app_module.date(2026, 6, 29)
 
 
 def test_future_week_ids_are_stored_without_parsing_lessons(app_module):
@@ -102,6 +147,117 @@ def test_schedule_without_parser_date_gets_current_week(registered_client, app_m
     assert admin_response.status_code == 200
     admin_payload = registered_client.get("/api/admin/schedule").json()
     assert any(week["starts_at"] == schedule["week"]["starts_at"] for week in admin_payload["weeks"])
+
+
+def test_student_can_open_selected_schedule_week(registered_client, app_module):
+    with app_module.db.transaction() as conn:
+        current = app_module.save_parsed_schedule(
+            conn,
+            "fvs",
+            "515-1",
+            {
+                "week_type": "нечетная",
+                "week_id": 828,
+                "week_number": 43,
+                "starts_at": app_module.date(2026, 6, 22),
+            },
+            [
+                {
+                    "day_number": 1,
+                    "lesson_number": 1,
+                    "discipline": "Текущая неделя",
+                    "lesson_type": "Практика",
+                    "auditorium": "425",
+                    "teacher_name": "Преподаватель",
+                    "start_time": "08:50",
+                    "end_time": "10:25",
+                }
+            ],
+        )
+        app_module.save_parsed_schedule(
+            conn,
+            "fvs",
+            "515-1",
+            {
+                "week_type": "четная",
+                "week_id": 829,
+                "week_number": 44,
+                "starts_at": app_module.date(2026, 6, 29),
+            },
+            [
+                {
+                    "day_number": 2,
+                    "lesson_number": 2,
+                    "discipline": "Следующая неделя",
+                    "lesson_type": "Лекция",
+                    "auditorium": "426",
+                    "teacher_name": "Преподаватель",
+                    "start_time": "10:40",
+                    "end_time": "12:15",
+                }
+            ],
+        )
+
+    profile_response = registered_client.patch("/api/profile", json={"group_id": current["group_id"]})
+    assert profile_response.status_code == 200
+
+    response = registered_client.get("/api/schedule?week_start=2026-06-29")
+    assert response.status_code == 200
+    payload = response.json()
+
+    assert payload["week"]["starts_at"] == "2026-06-29"
+    assert payload["week"]["source_week_id"] == 829
+    assert payload["lessons"][0]["discipline"] == "Следующая неделя"
+    assert payload["navigation"]["selected"] == "2026-06-29"
+    assert {week["starts_at"] for week in payload["availableWeeks"]} >= {"2026-06-22", "2026-06-29"}
+
+
+def test_admin_one_group_sync_uses_week_offset(admin_client, app_module, monkeypatch):
+    from server.tusur_timetable import Lesson, Schedule, WeekInfo
+
+    requested_week_ids = []
+
+    class FakeTimetableClient:
+        def __init__(self, *args, **kwargs):
+            pass
+
+        def fetch_current_week(self, faculty, group_name):
+            return WeekInfo(week_id=900, week_number=12, week_type="четная", starts_at=app_module.date(2026, 6, 22))
+
+        def fetch_schedule(self, faculty, group_name, week_id=None):
+            requested_week_ids.append(week_id)
+            return Schedule(
+                faculty=faculty,
+                group=group_name,
+                week=WeekInfo(week_id=900, week_number=12, week_type="четная", starts_at=app_module.date(2026, 6, 22)),
+                lessons=(
+                    Lesson(
+                        day_number=1,
+                        lesson_number=1,
+                        discipline="Следующая неделя",
+                        lesson_type="Практика",
+                        auditorium="425",
+                        teacher_name="Преподаватель",
+                        start_time="08:50",
+                        end_time="10:25",
+                    ),
+                ),
+            )
+
+    monkeypatch.setattr(app_module, "TusurTimetableClient", FakeTimetableClient)
+
+    response = admin_client.post(
+        "/api/admin/schedule/sync",
+        json={"faculty": "fvs", "group": "515-1", "week_offset": "1"},
+    )
+
+    assert response.status_code == 200
+    payload = response.json()
+    assert requested_week_ids == [901]
+    assert payload["parsed"]["week"]["week_id"] == 901
+    assert payload["parsed"]["week"]["week_number"] == 13
+    assert payload["parsed"]["week"]["week_type"] == "нечетная"
+    assert payload["parsed"]["week"]["starts_at"] == "2026-06-29"
 
 
 def test_schedule_progress_job_reports_real_percent(admin_client, app_module, monkeypatch):

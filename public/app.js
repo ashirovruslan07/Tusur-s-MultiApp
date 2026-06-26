@@ -23,6 +23,7 @@ const state = {
   syncProgress: null,
   adminFilters: { faculty: "", course: "" },
   adminActionFilters: { groupsFaculty: "", pointFaculty: "", massFaculty: "" },
+  scheduleWeekStart: currentWeekMondayIso(),
   profileFilters: { facultyId: "", courseNumber: "" },
   financeFilters: { type: "all", account: "all", search: "" },
   plannerFilters: { status: "active", priority: "all" }
@@ -107,10 +108,17 @@ function scheduleMonthLabel(startIso) {
 
 function scheduleWeekRangeLabel(startIso) {
   const start = parseIsoDate(startIso);
-  const endIso = addDaysIso(startIso, 5);
+  const endIso = addDaysIso(startIso, 6);
   const end = parseIsoDate(endIso);
   if (!start || !end) return "";
   return `${start.getDate()} ${monthNames[start.getMonth()]} - ${end.getDate()} ${monthNames[end.getMonth()]}`;
+}
+
+function scheduleWeekRangeShort(startIso, endIso) {
+  const start = parseIsoDate(startIso);
+  const end = parseIsoDate(endIso || addDaysIso(startIso, 6));
+  if (!start || !end) return "";
+  return `${dateRu(formatIsoDate(start))} - ${dateRu(formatIsoDate(end))}`;
 }
 
 function weekLabel(value) {
@@ -416,7 +424,10 @@ async function loadRoute(route) {
   state.route = route;
   state.notice = "";
   try {
-    state.data = await api(routes[route].api);
+    const endpoint = route === "schedule"
+      ? `${routes[route].api}?week_start=${encodeURIComponent(state.scheduleWeekStart || currentWeekMondayIso())}`
+      : routes[route].api;
+    state.data = await api(endpoint);
     if (route === "profile") {
       state.profile = state.data.profile;
       const profile = state.data.profile || {};
@@ -1410,13 +1421,20 @@ function renderSchedule(data) {
   const group = data.group || {};
   const week = data.week || {};
   const lessons = data.lessons || [];
+  const navigation = data.navigation || {};
   const message = data.message || "Для выбранной группы расписание еще не загружено администратором.";
   const weekStart = scheduleWeekStart(week);
   const monthLabel = scheduleMonthLabel(weekStart);
   const weekRange = scheduleWeekRangeLabel(weekStart);
+  const selectedWeek = navigation.selected || weekStart;
+  const actions = `
+    <button class="btn btn-secondary" type="button" data-schedule-week="${escapeHtml(navigation.previous || addDaysIso(selectedWeek, -7))}">← Неделя</button>
+    <button class="btn ${selectedWeek === navigation.current ? "btn-primary" : "btn-secondary"}" type="button" data-schedule-week="${escapeHtml(navigation.current || currentWeekMondayIso())}">Текущая</button>
+    <button class="btn btn-secondary" type="button" data-schedule-week="${escapeHtml(navigation.next || addDaysIso(selectedWeek, 7))}">Неделя →</button>
+  `;
   return `
     ${topbar("Расписание", "Расписание выбранной группы. Обновление выполняет администратор.",
-      `<span class="badge badge-primary">${escapeHtml(group.group_name || "Группа не выбрана")}</span>`)}
+      `<span class="badge badge-primary">${escapeHtml(group.group_name || "Группа не выбрана")}</span>${actions}`)}
     <section class="grid grid-3">
       <div class="card"><h3 class="section-title">Группа</h3><div class="profile section-gap"><div class="avatar">${escapeHtml(initials(group.group_name || "ИС"))}</div><div><strong>${escapeHtml(group.group_name || "Не выбрана")}</strong><div class="muted">${escapeHtml(group.faculty_name || "Выберите группу в профиле")} · ${group.course_number || "-"} курс</div></div></div></div>
       <div class="card"><h3 class="section-title">${escapeHtml(monthLabel || "Неделя")}</h3><div class="section-gap"><span class="badge badge-primary">${weekLabel(week.week_type)}</span></div><div class="stat-note">${escapeHtml(weekRange || "Период не указан")}</div></div>
@@ -1636,6 +1654,7 @@ function renderAdminSchedule(data) {
   const selectedGroups = pointFaculty ? pointGroups : groups;
   const schedules = data.schedules || [];
   const weeks = data.weeks || [];
+  const currentWeek = data.currentWeek || {};
   const summary = data.summary || {};
   const settings = data.syncSettings || {};
   const logs = data.syncLogs || [];
@@ -1643,7 +1662,7 @@ function renderAdminSchedule(data) {
   const usersByFaculty = data.usersByFaculty || [];
   return `
     ${topbar("Администрирование расписания", "Массовое обновление групп и расписаний, автообновление перед следующей неделей и контроль покрытия.",
-      `<span class="badge badge-purple">Только администратор</span>`)}
+      `<span class="badge badge-purple">Только администратор</span><span class="badge badge-cyan">ID текущей недели: ${escapeHtml(currentWeek.source_week_id || "не задан")}</span>`)}
     <section class="grid grid-4">
       <div class="kpi kpi-primary"><h3>Пользователи</h3><strong>${summary.student_users || 0}</strong><small>Студентов в системе</small></div>
       <div class="kpi kpi-cyan"><h3>Группы</h3><strong>${summary.total_groups || groups.length}</strong><small>${faculties.length} факультетов</small></div>
@@ -1670,6 +1689,7 @@ function renderAdminSchedule(data) {
           <div class="form-grid">
             <div class="field"><label>Факультет</label>${facultySelect(faculties, "faculty", pointFaculty, "pointFaculty")}</div>
             <div class="field"><label>Группа</label>${adminGroupSelect(selectedGroups, selectedGroups[0]?.group_name)}</div>
+            <div class="field field-full"><label>Неделя для парса</label><select name="week_offset"><option value="-1">Предыдущая</option><option value="0" selected>Текущая</option><option value="1">Следующая</option></select></div>
           </div>
           <div class="form-actions"><button class="btn btn-primary" type="submit" ${selectedGroups.length ? "" : "disabled"}>Обновить расписание группы</button></div>
         </form>
@@ -1817,6 +1837,16 @@ document.addEventListener("click", async (event) => {
   if (reload) {
     await loadRoute(state.route);
     notify("Данные обновлены");
+    return;
+  }
+
+  const scheduleWeek = event.target.closest("[data-schedule-week]");
+  if (scheduleWeek) {
+    const value = scheduleWeek.dataset.scheduleWeek;
+    if (value) {
+      state.scheduleWeekStart = value;
+      await loadRoute("schedule");
+    }
     return;
   }
 

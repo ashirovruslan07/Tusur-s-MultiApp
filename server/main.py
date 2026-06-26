@@ -402,12 +402,21 @@ def settings_payload(user_id: int, conn=None) -> dict[str, Any] | None:
     )
 
 
-def schedule_payload(user_id: int, group_id: int | None = None, week_type: str | None = None, conn=None) -> dict[str, Any]:
+def schedule_payload(
+    user_id: int,
+    group_id: int | None = None,
+    week_type: str | None = None,
+    week_start: str | date | None = None,
+    conn=None,
+) -> dict[str, Any]:
     settings = settings_payload(user_id, conn)
     profile = profile_payload(user_id, conn)
     selected_group_id = int(group_id or (profile or {}).get("group_id") or (settings or {}).get("selected_group_id") or 0)
     selected_week_type = normalize_week_for_schedule(week_type or (settings or {}).get("selected_week_type"))
     current_date = today()
+    selected_week_start = monday_for_date(parse_schedule_date(week_start) or datetime.now(APP_TZ).date())
+    selected_week_end = selected_week_start + timedelta(days=6)
+    target_date = selected_week_start.isoformat()
 
     group = None
     if selected_group_id:
@@ -435,12 +444,12 @@ def schedule_payload(user_id: int, group_id: int | None = None, week_type: str |
             WHERE ws.group_id = :group_id
               AND ws.week_type = :week_type
               AND COALESCE(sw.starts_at, ws.starts_at) IS NOT NULL
-              AND :current_date BETWEEN substr(COALESCE(sw.starts_at, ws.starts_at), 1, 10)
+              AND :target_date BETWEEN substr(COALESCE(sw.starts_at, ws.starts_at), 1, 10)
                   AND substr(COALESCE(sw.ends_at, ws.starts_at), 1, 10)
             ORDER BY ws.schedule_id DESC
             LIMIT 1
             """,
-            {"group_id": group["group_id"], "week_type": selected_week_type, "current_date": current_date},
+            {"group_id": group["group_id"], "week_type": selected_week_type, "target_date": target_date},
             conn,
         ) or db.fetch_one(
             """
@@ -451,12 +460,12 @@ def schedule_payload(user_id: int, group_id: int | None = None, week_type: str |
             LEFT JOIN Schedule_Weeks sw ON sw.schedule_week_id = ws.schedule_week_id
             WHERE ws.group_id = :group_id
               AND COALESCE(sw.starts_at, ws.starts_at) IS NOT NULL
-              AND :current_date BETWEEN substr(COALESCE(sw.starts_at, ws.starts_at), 1, 10)
+              AND :target_date BETWEEN substr(COALESCE(sw.starts_at, ws.starts_at), 1, 10)
                   AND substr(COALESCE(sw.ends_at, ws.starts_at), 1, 10)
             ORDER BY ws.schedule_id DESC
             LIMIT 1
             """,
-            {"group_id": group["group_id"], "current_date": current_date},
+            {"group_id": group["group_id"], "target_date": target_date},
             conn,
         )
 
@@ -473,12 +482,46 @@ def schedule_payload(user_id: int, group_id: int | None = None, week_type: str |
             conn,
         )
 
+    available_weeks = []
+    if group:
+        available_weeks = db.fetch_all(
+            """
+            SELECT COALESCE(sw.starts_at, ws.starts_at) AS starts_at,
+                   COALESCE(sw.ends_at, ws.starts_at) AS ends_at,
+                   ws.week_type, ws.week_number, ws.source_week_id,
+                   COUNT(ds.daily_schedule_id) AS lesson_count
+            FROM Weekly_Schedule ws
+            LEFT JOIN Schedule_Weeks sw ON sw.schedule_week_id = ws.schedule_week_id
+            LEFT JOIN Daily_Schedule ds ON ds.schedule_id = ws.schedule_id
+            WHERE ws.group_id = :group_id
+              AND COALESCE(sw.starts_at, ws.starts_at) IS NOT NULL
+            GROUP BY ws.schedule_id, sw.starts_at, sw.ends_at, ws.starts_at,
+                     ws.week_type, ws.week_number, ws.source_week_id
+            ORDER BY COALESCE(sw.starts_at, ws.starts_at)
+            """,
+            {"group_id": group["group_id"]},
+            conn,
+        )
+
+    selected_week = weekly or {
+        "starts_at": selected_week_start.isoformat(),
+        "ends_at": selected_week_end.isoformat(),
+        "week_type": selected_week_type,
+    }
+
     return {
         "group": group,
-        "week": weekly,
+        "week": selected_week,
         "lessons": lessons,
+        "availableWeeks": available_weeks,
+        "navigation": {
+            "current": fallback_week_start().isoformat(),
+            "selected": selected_week_start.isoformat(),
+            "previous": (selected_week_start - timedelta(days=7)).isoformat(),
+            "next": (selected_week_start + timedelta(days=7)).isoformat(),
+        },
         "dates": {"today": current_date},
-        "message": None if weekly else "На текущую дату расписание еще не загружено администратором.",
+        "message": None if weekly else "На выбранную неделю расписание еще не загружено администратором.",
         "metadata": schedule_metadata(conn),
     }
 
@@ -774,16 +817,31 @@ def week_type_for_offset(current_week_type: str | None, offset: int) -> str:
     return "нечетная" if current == "четная" else "четная"
 
 
+def week_start_for_offset(current_week: Any, offset: int) -> date:
+    base_start = parse_schedule_date(getattr(current_week, "starts_at", None))
+    if base_start:
+        return base_start + timedelta(days=offset * 7)
+    return fallback_week_start(offset)
+
+
 def complete_week_info(week: dict[str, Any], current_week: Any, offset: int) -> dict[str, Any]:
     completed = {**week}
-    if completed.get("week_id") is None and getattr(current_week, "week_id", None) is not None:
+    if offset != 0 and getattr(current_week, "week_id", None) is not None:
         completed["week_id"] = current_week.week_id + offset
-    if completed.get("week_number") is None and getattr(current_week, "week_number", None) is not None:
+    elif completed.get("week_id") is None and getattr(current_week, "week_id", None) is not None:
+        completed["week_id"] = current_week.week_id + offset
+    if offset != 0 and getattr(current_week, "week_number", None) is not None:
         completed["week_number"] = current_week.week_number + offset
-    if not completed.get("week_type"):
+    elif completed.get("week_number") is None and getattr(current_week, "week_number", None) is not None:
+        completed["week_number"] = current_week.week_number + offset
+    if offset != 0:
         completed["week_type"] = week_type_for_offset(getattr(current_week, "week_type", None), offset)
-    if not completed.get("starts_at"):
-        completed["starts_at"] = fallback_week_start(offset)
+    elif not completed.get("week_type"):
+        completed["week_type"] = week_type_for_offset(getattr(current_week, "week_type", None), offset)
+    if offset != 0:
+        completed["starts_at"] = week_start_for_offset(current_week, offset)
+    elif not completed.get("starts_at"):
+        completed["starts_at"] = week_start_for_offset(current_week, offset)
     return completed
 
 
@@ -797,7 +855,7 @@ def ensure_future_week_ids(conn, current_week: Any, weeks_ahead: int = 3) -> lis
             current_week,
             offset,
         )
-        rows.append(upsert_schedule_week(conn, week, fallback_week_start(offset)))
+        rows.append(upsert_schedule_week(conn, week, week_start_for_offset(current_week, offset)))
     return rows
 
 
@@ -1055,6 +1113,24 @@ def admin_schedule_payload(conn=None) -> dict[str, Any]:
         """,
         conn=conn,
     )
+    current_week = db.fetch_one(
+        """
+        SELECT sw.schedule_week_id, sw.source_week_id, sw.week_number, sw.week_type,
+               sw.starts_at, sw.ends_at, sw.synced_at,
+               COUNT(DISTINCT ws.group_id) AS group_count,
+               COUNT(ds.daily_schedule_id) AS lesson_count
+        FROM Schedule_Weeks sw
+        LEFT JOIN Weekly_Schedule ws ON ws.schedule_week_id = sw.schedule_week_id
+        LEFT JOIN Daily_Schedule ds ON ds.schedule_id = ws.schedule_id
+        WHERE :current_date BETWEEN substr(sw.starts_at, 1, 10) AND substr(sw.ends_at, 1, 10)
+        GROUP BY sw.schedule_week_id, sw.source_week_id, sw.week_number,
+                 sw.week_type, sw.starts_at, sw.ends_at, sw.synced_at
+        ORDER BY sw.source_week_id DESC, sw.schedule_week_id DESC
+        LIMIT 1
+        """,
+        {"current_date": today()},
+        conn=conn,
+    )
     user_summary = db.fetch_one(
         """
         SELECT COUNT(*) AS total_users,
@@ -1100,6 +1176,7 @@ def admin_schedule_payload(conn=None) -> dict[str, Any]:
         "groups": groups,
         "schedules": schedules,
         "weeks": weeks,
+        "currentWeek": current_week,
         "facultyCodes": FACULTIES,
         "summary": {
             **(user_summary or {}),
@@ -2265,9 +2342,10 @@ def update_settings(payload: dict[str, Any] = Body(default={}), user: dict[str, 
 def get_schedule(
     group_id: int | None = None,
     week_type: str | None = None,
+    week_start: str | None = None,
     user: dict[str, Any] = Depends(require_user),
 ) -> dict[str, Any]:
-    return schedule_payload(user["user_id"], group_id, week_type)
+    return schedule_payload(user["user_id"], group_id, week_type, week_start)
 
 
 @app.get("/api/schedule/metadata")
@@ -2463,6 +2541,12 @@ def sync_schedule(payload: dict[str, Any] = Body(default={}), user: dict[str, An
     faculty = payload.get("faculty") or "fvs"
     group_name = payload.get("group") or payload.get("group_name")
     week_id = payload.get("week_id") or None
+    week_offset = None
+    if payload.get("week_offset") not in (None, ""):
+        try:
+            week_offset = int(payload.get("week_offset"))
+        except (TypeError, ValueError):
+            raise HTTPException(status_code=400, detail="Некорректная неделя для парса")
     if not group_name:
         raise HTTPException(status_code=400, detail="Укажите группу")
     if payload.get("_progress"):
@@ -2476,10 +2560,11 @@ def sync_schedule(payload: dict[str, Any] = Body(default={}), user: dict[str, An
 
         return start_sync_progress_job("Синхронизация группы", runner)
 
+    target_week_label = week_id or (str(week_offset) if week_offset is not None else "current")
     log_id = create_sync_log(
         trigger_type="manual-one",
         target_scope=f"{faculty}:{group_name}",
-        target_week=str(week_id or "current"),
+        target_week=str(target_week_label),
         total_groups=1,
     )
     result = {
@@ -2497,6 +2582,8 @@ def sync_schedule(payload: dict[str, Any] = Body(default={}), user: dict[str, An
         current_week = client.fetch_current_week(faculty, group_name)
         with db.transaction() as conn:
             ensure_future_week_ids(conn, current_week)
+        if week_id is None and week_offset is not None and current_week.week_id is not None:
+            week_id = current_week.week_id + week_offset
         parsed = client.fetch_schedule(faculty, group_name, week_id)
         week_offset = 0
         if week_id and current_week.week_id is not None:
@@ -2525,7 +2612,7 @@ def sync_schedule(payload: dict[str, Any] = Body(default={}), user: dict[str, An
             }
 
         with db.transaction() as conn:
-            save_parsed_schedule(conn, faculty, group_name, week, lessons, fallback_starts_at=fallback_week_start())
+            save_parsed_schedule(conn, faculty, group_name, week, lessons, fallback_starts_at=week_start_for_offset(current_week, week_offset))
             saved_group = conn.execute("SELECT group_id FROM Groups WHERE group_name = :group_name", {"group_name": group_name}).fetchone()
             group_id = saved_group["group_id"]
 
